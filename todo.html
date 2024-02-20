@@ -1,0 +1,67 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TODO List</title>
+</head>
+<body>
+<button onclick="getList()">Получить список</button>
+<table id="todoTable">
+    <thead>
+    <tr>
+        <th>№</th>
+        <th>Пользователь</th>
+        <th>Задача</th>
+        <th>Выполнено</th>
+    </tr>
+    </thead>
+    <tbody id="todoBody">
+    </tbody>
+</table>
+
+<script>
+    function getList() {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "https://jsonplaceholder.typicode.com/todos", true);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                var todos = JSON.parse(xhr.responseText);
+                getUsers(todos);
+            }
+        };
+        xhr.send();
+    }
+
+    function getUsers(todos) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "https://jsonplaceholder.typicode.com/users", true);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                var users = JSON.parse(xhr.responseText);
+                displayTodos(todos, users);
+            }
+        };
+        xhr.send();
+    }
+
+    function displayTodos(todos, users) {
+        var todoBody = document.getElementById("todoBody");
+        todoBody.innerHTML = "";
+
+        todos.forEach(function (todo, index) {
+            var user = users.find(function (user) {
+                return user.id === todo.userId;
+            });
+            var row = document.createElement("tr");
+            row.innerHTML = "<td>" + (index + 1) + "</td>" +
+                "<td>" + user.name + "</td>" +
+                "<td>" + todo.title + "</td>" +
+                "<td><input type='checkbox' disabled " + (todo.completed ? "checked" : "") + "></td>";
+            todoBody.appendChild(row);
+        });
+    }
+</script>
+</body>
+</html>
